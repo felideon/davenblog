@@ -3,8 +3,6 @@
 (defun create-davenblog-db ()
   (create-database "davenblog"))
 
-(defun 
-
 (defdoc blog-post
     ((:timestamp :validator #'numberp)
      (:author :validator #'stringp)

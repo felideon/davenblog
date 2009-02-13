@@ -17,4 +17,10 @@
 (push (create-prefix-dispatcher "/view_entries" 'view-blog-posts)
       *dispatch-table*)
 
+(push (create-prefix-dispatcher "/new_post" 'new-post)
+      *dispatch-table*)
+
+(push (create-prefix-dispatcher "/publish_post" 'publish-post)
+      *dispatch-table*)
+
 (defparameter *web-server* (start-server :port 8080))

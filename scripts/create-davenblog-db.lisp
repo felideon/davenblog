@@ -4,4 +4,4 @@
 
 ;; Create database and design documents.
 (create-davenblog-db)
-(create-design-doc-all-blog-posts)
+(create-design-doc-all-posts)

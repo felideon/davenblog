@@ -24,3 +24,11 @@
       *dispatch-table*)
 
 (defparameter *web-server* (start-server :port 8080))
+
+;; Global Constants
+(defconstant day-names
+  '("Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday" "Sunday"))
+
+(defconstant month-names
+  '("January" "February" "March" "April" "May" "June"
+    "July" "August" "September" "October" "November" "December"))

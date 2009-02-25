@@ -1,2 +1,12 @@
 body { background: #ffffff;
-       color: #3333ff }
+       color: #000000;
+       font-family: Tahoma, Geneva, sans-serif;
+       font-size: 10pt }
+
+h3 { font-size: small }
+
+.post { border-left: thin dashed #000000;
+        padding-left: 1em;
+        margin-bottom: 2em }
+
+.post-footer { font-size: smaller }

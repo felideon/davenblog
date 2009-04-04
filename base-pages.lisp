@@ -19,66 +19,70 @@
 	     (:h1 "My Blog")
 	     ,@body))))
 
-(defun print-date (universal-time)
-  (multiple-value-bind
-	(second minute hour day month year day-of-week)
-      (decode-universal-time universal-time)
-    (declare (ignore second minute hour))
-    (format t "~a, ~a ~d, ~d"
-	    (nth day-of-week day-names)
-	    (nth month month-names)
-	    day
-	    year)))
-
 (defmacro render-blog-post (post)
-  `(let ((post-value (cdr (third ,post))))
-     (with-html
-       (:div :class "post"
-	(:h2 (format t "~a" (cdr (assoc :title post-value))))
-	(:h3 (print-date (cdr (assoc :timestamp post-value))))
-	(:p (format t "~a" (cdr (assoc :body post-value))))
-	(:p :class "post-footer"
-	    (format t "Posted by ~a" (cdr (assoc :author post-value)))
-	    (:br)
-	    (format t "Tags: ~{~a~^, ~}"
-		    (or (cdr (third post-value))
-			'("None"))))))))
+  `(with-html
+     (:div :class "post"
+	   (:h2 (format t "~a" (cdr (assoc :title ,post))))
+	   (:h3 (print-date (cdr (assoc :timestamp ,post))))
+	   (:p (format t "~a" (cdr (assoc :body ,post))))
+	   (:p :class "post-footer"
+	       (format t "Posted by ~a" (cdr (assoc :author ,post)))
+	       (:br)
+	       (format t "Tags: ~{~:(~a~)~^, ~}"
+		       (or (cdr (third ,post))
+			   '("None")))))))
   
 (defun view-blog-posts ()
   (base-page (:title "My Blog")
     (dolist (row (reverse (cdr (third (get-all-posts-by-date)))))
-      (format t "~a" (render-blog-post row)))))
+      (format t "~a" (render-blog-post (cdr (third row)))))))
 
 (defun new-post ()
   (base-page (:title "New Post")
     (:h2 "Add New Post")
-    (:form :action "/publish_post" :method "post"
+    (:form :action "/preview_post" :method "post"
 	   (:input :type "text" :name "title" :size "60")
 	   (:p)
 	   (:textarea :name "body" :rows "20" :cols "80")
 	   (:p "Tags"
 	       (:input :type "text" :name "tags" :size "20")
 	       (:input :type "hidden" :name "author" :value "Felipe Delgado")
-	       (:input :type "button" :name "preview" :value "Preview")
-	       (:input :type "submit" :value "Publish")
-	       (:input :type "reset" :value "Clear Form")))))
+	       (:input :type "submit" :name "preview" :value "Preview")
+	       (:input :type "submit" :name "publish" :value "Publish")))))
 
-(defun publish-post ()
-  (let ((title (parameter "title"))
+(defun preview-post ()
+  (let ((time (get-universal-time))
+	(title (parameter "title"))
 	(body (parameter "body"))
 	(tags (parameter "tags"))
-	(author (parameter "author")))
-    (unless (and (or (null title) (zerop (length title)))
-		 (or (null body) (zerop (length body))))
-      (post-blog-entry (get-universal-time)
-		       author
-		       title
-		       body
-		       (split-tags tags))
-    (redirect "/view_entries"))))
+	(author (parameter "author"))
+	(publish (parameter "publish")))
+    (when (and (valid-field-p title) (valid-field-p body))
+      (let ((post (list time author title body (split-tags tags))))
+	(if (valid-field-p publish)
+	    (progn 
+	      (post-blog-entry post)
+	      (redirect "/view_entries"))
+	    (preview-blog-entry post))))))
 
-(defun split-tags (string)
-  (loop for i = 0 then (1+ j)
-       as j = (position #\, string :start i)
-       collect (subseq string i j)
-       while j))
+
+(defun preview-blog-entry (post)
+  (let ((author (nth 1 post))
+	(body (nth 3 post))
+	(tags (nth 4 post))
+	(timestamp (nth 0 post))
+	(title (nth 2 post)))
+    (base-page (:title "My Blog")
+      (format t "~a" (render-blog-post
+		      (list (cons :author author)
+			    (cons :body body)
+			    (cons :tags tags)
+			    (cons :timestamp timestamp)
+			    (cons :title title)))))))
+      ;(:form :action "/preview_post" :method "post"
+	     ;(:input :type "hidden" :name "author" :value author)
+	     ;(:input :type "hidden" :name "body" :value body)
+	     ;(:input :type "hidden" :name "tags" :value tags)
+	     ;(:input :type "hidden" :name "timestamp" :value timestamp)
+	     ;(:input :type "hidden" :name "title" :value title)
+	     ;(:input :type "submit" :name "publish" :value "Publish")))))

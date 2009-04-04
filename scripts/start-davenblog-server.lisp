@@ -20,10 +20,10 @@
 (push (create-prefix-dispatcher "/new_post" 'new-post)
       *dispatch-table*)
 
-(push (create-prefix-dispatcher "/publish_post" 'publish-post)
+(push (create-prefix-dispatcher "/preview_post" 'preview-post)
       *dispatch-table*)
 
-(defparameter *web-server* (start-server :port 8080))
+(start (make-instance 'acceptor :port 8080))
 
 ;; Global Constants
 (defconstant day-names

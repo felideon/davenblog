@@ -14,7 +14,6 @@
     (:documentation "Views for returning all blog posts.")
     (:sync davenblog)))
 
-
 (defdoc blog-post
     ((:timestamp :validator #'numberp)
      (:author :validator #'stringp)
@@ -23,13 +22,13 @@
      (:tags :validator #'listp))
   (:default-db 'davenblog))
 
-(defun post-blog-entry (timestamp author title body tags)
+(defun post-blog-entry (post)
   (make-doc-and-save 'blog-post
-		     :timestamp timestamp
-		     :author author
-		     :title title
-		     :body body
-		     :tags tags))
+		     :timestamp (nth 0 post)
+		     :author (nth 1 post)
+		     :title (nth 2 post)
+		     :body (nth 3 post)
+		     :tags (nth 4 post)))
 
 (defmacro get-all-posts ((&key view) &body body)
   `(couch-request :get ,(append '(davenblog/_view/all_posts/) view body)))

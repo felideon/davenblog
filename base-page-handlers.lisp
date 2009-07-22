@@ -30,10 +30,10 @@
 	       (:br)
 	       (format t "Tags: ~{~:(~a~)~^, ~}"
 		       (or (cdr (third ,post)) '("None")))))))
-  
+
 (defun view-blog-posts ()
   (base-page (:title "My Blog")
-    (dolist (row (reverse (get-all-posts-by-date)))
+    (dolist (row (reverse (cdr (third (get-all-posts-by-date)))))
       (format t "~a" (render-blog-post (cdr (third row)))))))
 
 (defun new-post ()

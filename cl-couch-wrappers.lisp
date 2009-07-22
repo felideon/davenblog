@@ -31,7 +31,8 @@
 		     :post (nth 3 comment)))
 
 (defun get-all-posts-by-date ()
-  (query-view 'posts-by-timestamp))
+  (couch-request* :get *couchdb-server* 
+		  '(davenblog _view blog_entries posts_by_timestamp)))
 
 (defun get-posts-and-comments (id)
   (query-view 'posts-and-comments

@@ -29,18 +29,17 @@
 	       (format t "Posted by ~a" (cdr (assoc :author ,post)))
 	       (:br)
 	       (format t "Tags: ~{~:(~a~)~^, ~}"
-		       (or (cdr (third ,post))
-			   '("None")))))))
+		       (or (cdr (third ,post)) '("None")))))))
   
 (defun view-blog-posts ()
   (base-page (:title "My Blog")
-    (dolist (row (reverse (cdr (third (get-all-posts-by-date)))))
+    (dolist (row (reverse (get-all-posts-by-date)))
       (format t "~a" (render-blog-post (cdr (third row)))))))
 
 (defun new-post ()
   (base-page (:title "New Post")
     (:h2 "Add New Post")
-    (:form :action "/preview_post" :method "post"
+    (:form :action "/submit_post" :method "post"
 	   (:input :type "text" :name "title" :size "60")
 	   (:p)
 	   (:textarea :name "body" :rows "20" :cols "80")
@@ -50,39 +49,29 @@
 	       (:input :type "submit" :name "preview" :value "Preview")
 	       (:input :type "submit" :name "publish" :value "Publish")))))
 
-(defun preview-post ()
-  (let ((time (get-universal-time))
-	(title (parameter "title"))
-	(body (parameter "body"))
-	(tags (parameter "tags"))
-	(author (parameter "author"))
-	(publish (parameter "publish")))
-    (when (and (valid-field-p title) (valid-field-p body))
-      (let ((post (list time author title body (split-tags tags))))
-	(if (valid-field-p publish)
-	    (progn 
-	      (post-blog-entry post)
-	      (redirect "/view_entries"))
-	    (preview-blog-entry post))))))
-
-
 (defun preview-blog-entry (post)
-  (let ((author (nth 1 post))
-	(body (nth 3 post))
-	(tags (nth 4 post))
-	(timestamp (nth 0 post))
-	(title (nth 2 post)))
-    (base-page (:title "My Blog")
-      (format t "~a" (render-blog-post
-		      (list (cons :author author)
-			    (cons :body body)
-			    (cons :tags tags)
-			    (cons :timestamp timestamp)
-			    (cons :title title)))))))
-      ;(:form :action "/preview_post" :method "post"
-	     ;(:input :type "hidden" :name "author" :value author)
-	     ;(:input :type "hidden" :name "body" :value body)
-	     ;(:input :type "hidden" :name "tags" :value tags)
-	     ;(:input :type "hidden" :name "timestamp" :value timestamp)
-	     ;(:input :type "hidden" :name "title" :value title)
-	     ;(:input :type "submit" :name "publish" :value "Publish")))))
+  (base-page (:title "My Blog")
+	     (format t "~a" (render-blog-post
+			     (list (cons :author (nth 1 post))
+				   (cons :body (nth 3 post))
+				   (cons :tags (nth 4 post))
+				   (cons :timestamp (nth 0 post))
+				   (cons :title (nth 2 post)))))))
+
+(defun view-entry ()
+  (base-page (:title "My Blog")
+    (format t "~a" (render-blog-post (get-post-by-id (parameter "id"))))
+    (:p)
+    (format t "~a" (comment-form))))
+
+(defun comment-form ()
+  (with-html
+    (:h3 "Leave a Comment")
+    (:form :action "/submit_comment" :method "post"
+	   (:p "Name: "
+	       (:input :type "text" :name "author" :size "20")
+	       (:br)
+	       (:textarea :name "body" :rows "5" :cols "30")
+	       (:input :type "hidden" :name "post" :value (parameter "id"))
+	       (:br)
+	       (:input :type "submit" :value "Leave Comment")))))

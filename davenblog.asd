@@ -2,10 +2,12 @@
   :name "davenblog"
   :depends-on (#:cl-couch #:hunchentoot #:cl-who)
   :components ((:file "package")
-	       (:file "backend"
+	       (:file "cl-couch-wrappers"
 		      :depends-on ("package"))
 	       (:file "helper-functions"
 		      :depends-on ("package"))
-	       (:file "base-pages"
-		      :depends-on ("backend")
-		      :depends-on ("helper-functions"))))
+	       (:file "page-actions"
+		      :depends-on ("cl-couch-wrappers")
+		      :depends-on ("helper-functions"))
+	       (:file "base-page-handlers"
+		      :depends-on ("page-actions"))))

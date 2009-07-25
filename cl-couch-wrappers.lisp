@@ -34,9 +34,11 @@
   (couch-request* :get *couchdb-server* 
 		  '(davenblog _view blog_entries posts_by_timestamp)))
 
-(defun get-posts-and-comments (id)
-  (query-view 'posts-and-comments
-	      :startkey (list id) :endkey (list id (get-universal-time))))
+(defun get-post-and-comments (id)
+  (couch-request* :get *couchdb-server*
+		  '(davenblog _view blog_entries posts_and_comments)
+		  (cl-couchdb-view-server::prepare-keys
+		   (list :startkey (list id) :endkey (list id 2)))))
 
 (defun get-post-by-id (id)
   (couch-request* :get *couchdb-server* `(davenblog ,id)))

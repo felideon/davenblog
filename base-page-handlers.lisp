@@ -29,7 +29,10 @@
 	       (format t "Posted by ~a" (cdr (assoc :author ,post)))
 	       (:br)
 	       (format t "Tags: ~{~:(~a~)~^, ~}"
-		       (or (cdr (third ,post)) '("None")))))))
+		       (or (cdr (third ,post)) '("None")))
+	       (:p
+		(format t "~a comments"
+			(count-comments (cdr (assoc :_id ,post)))))))))
 
 (defun view-blog-posts ()
   (base-page (:title "My Blog")

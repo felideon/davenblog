@@ -22,3 +22,7 @@
 
 (defun comma-separate-tags (tags)
   (format t "~{~a~^,~}" tags))
+
+(defun count-comments (id)
+  (- (length (cdr (third (get-post-and-comments id))))
+     1))
